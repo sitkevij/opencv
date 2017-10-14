@@ -14,9 +14,9 @@ MAINTAINER Julian Sitkevich <sitkevij@gmail.com>
 
 RUN echo -e '@edge http://nl.alpinelinux.org/alpine/edge/main\n@testing http://nl.alpinelinux.org/alpine/edge/testing' >> /etc/apk/repositories \
   && apk update && apk add ca-certificates && update-ca-certificates \
-  && apk add --no-cache openssl \
   && apk upgrade \
-  && apk add --no-cache \ 
+  && apk add --virtual build-dependencies --no-cache \ 
+    openssl \
     build-base \
     linux-headers \ 
     unzip \ 
@@ -45,3 +45,4 @@ RUN echo -e '@edge http://nl.alpinelinux.org/alpine/edge/main\n@testing http://n
     && cd \
     && rm 3.3.0.zip \
     && rm -rf /var/cache/apk/*
+    && apk del build-dependencies
