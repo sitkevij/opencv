@@ -44,5 +44,5 @@ RUN echo -e '@edge http://nl.alpinelinux.org/alpine/edge/main\n@testing http://n
     && make install \
     && cd \
     && rm 3.3.0.zip \
-    && rm -rf /var/cache/apk/*
+    && rm -rf /var/cache/apk/* \
     && apk del build-dependencies
