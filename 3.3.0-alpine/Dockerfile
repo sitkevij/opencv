@@ -1,4 +1,7 @@
-FROM alpine:3.5
+ARG BASEOS_VER
+FROM $BASEOS_VER
+
+ARG APP_VER
 
 ######## changelog
 # 01 [x] test new apk adds: docker run --rm -it alpine sh, docker run --rm -it sitkevij/opencv python3 -c 'print("Hello World")'
@@ -10,9 +13,17 @@ FROM alpine:3.5
 # 07 [x] libjasper -> libjasper-dev
 # 08 [ ] use of virtual and/or apk del with edge/testing results in unsatisfiable constraints https://github.com/gliderlabs/docker-alpine/issues/205
 # 09 [x] add improved opencv cmake build flags
+# 10 [ ] docker run --rm -it sitkevij/opencv python -c "import cv2 print cv2.getBuildInformation()" && /usr/local/bin/opencv_version
+# 11 [ ] review Dockerfile against https://github.com/opencv/opencv/blob/master/CMakeLists.txt 
+# 12 [ ] Set runtime path of "/usr/local/lib/python2.7/site-packages/cv2.so" to "/usr/local/lib" 
+# 13 [x] support Docker 17.05 ARG feature
 ########
 
-MAINTAINER Julian Sitkevich <sitkevij@gmail.com>
+ENV CPUCOUNT 1
+RUN CPUCOUNT=$(cat /proc/cpuinfo | grep '^processor.*:' | wc -l)
+
+RUN echo "ENV=$$HOME/.shrc; export ENV" >~/.profile && \
+    echo "export PYTHONPATH=/usr/local/lib/python2.7/site-packages:$$PYTHONPATH" >~/.shrc
 
 RUN echo -e '@edge http://nl.alpinelinux.org/alpine/edge/main\n@testing http://nl.alpinelinux.org/alpine/edge/testing' >> /etc/apk/repositories \
   && apk update && apk add ca-certificates && update-ca-certificates \
@@ -27,6 +38,8 @@ RUN echo -e '@edge http://nl.alpinelinux.org/alpine/edge/main\n@testing http://n
     git \ 
     gnutls \
     python \
+    python-dev \
+    py-pip \
     # python3-dev \
     libtbb@testing \
     libtbb-dev@testing \
@@ -35,16 +48,18 @@ RUN echo -e '@edge http://nl.alpinelinux.org/alpine/edge/main\n@testing http://n
     libpng-dev \ 
     tiff-dev \
     libjasper \
-  && cd \
-    && echo "nproc $(($(nproc) + 1))" \
-    && wget https://github.com/Itseez/opencv/archive/3.3.0.zip \
-    && unzip 3.3.0.zip \
-    && cd opencv-3.3.0 \
+    && pip install --upgrade pip \
+    && pip install numpy 
+RUN cd \
+    && wget https://github.com/Itseez/opencv/archive/${APP_VER}.zip \
+    && unzip ${APP_VER}.zip \
+    && cd opencv-${APP_VER} \
     && mkdir build \
     && cd build \
     && cmake \ 
         -D CMAKE_BUILD_TYPE=RELEASE \
         -D CMAKE_INSTALL_PREFIX=/usr/local \
+        -D BUILD_opencv_python2=ON \ 
         -D INSTALL_C_EXAMPLES=OFF \
         -D INSTALL_PYTHON_EXAMPLES=OFF \
         -D BUILD_DOCS=OFF \
@@ -55,9 +70,10 @@ RUN echo -e '@edge http://nl.alpinelinux.org/alpine/edge/main\n@testing http://n
         -D WITH_IPP=NO \
         -D WITH_OPENEXR=NO \
         ..  \
-    && make -j4 \
+    && make -j${CPUCOUNT} \
     && make install \
     && cd \
-    && rm 3.3.0.zip \
+    && rm ${APP_VER}.zip \
     && rm -rf /var/cache/apk/* \
     # && apk del openssl build-base linux-headers unzip wget cmake git gnutls
+
