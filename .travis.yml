@@ -2,6 +2,10 @@ sudo: required
 language: bash
 services: docker
 
+before_install:
+  - sudo apt-get update
+  - sudo apt-get -y -o Dpkg::Options::="--force-confnew" install docker-ce
+
 env:
   global:
     - VERSION=3.3.0-alpine IMAGE=opencv BASEOS_VER=alpine:3.5 APP_VER=3.3.0
