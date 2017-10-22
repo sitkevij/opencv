@@ -4,14 +4,14 @@ services: docker
 
 env:
   global:
-    - VERSION=3.3.0-alpine IMAGE=opencv
+    - VERSION=3.3.0-alpine IMAGE=opencv BASEOS_VER=alpine:3.5 APP_VER=3.3.0
     
 jobs:
   include:
     - stage: build, test and deploy image
       script:
       - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
-      - docker build -t $DOCKER_USERNAME/$IMAGE:latest -t $DOCKER_USERNAME/$IMAGE:$VERSION $VERSION
+      - docker build --build-arg BASEOS_VER=$BASEOS_VER --build-arg APP_VER=$APP_VER -t $DOCKER_USERNAME/$IMAGE:latest -t $DOCKER_USERNAME/$IMAGE:$VERSION $VERSION
       - docker images
       - docker run $DOCKER_USERNAME/$IMAGE
       - docker tag $DOCKER_USERNAME/$IMAGE:latest $DOCKER_USERNAME/$IMAGE:$VERSION
