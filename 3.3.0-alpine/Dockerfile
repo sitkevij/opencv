@@ -16,14 +16,18 @@ ARG APP_VER
 # 10 [ ] docker run --rm -it sitkevij/opencv python -c "import cv2 print cv2.getBuildInformation()" && /usr/local/bin/opencv_version
 # 11 [ ] review Dockerfile against https://github.com/opencv/opencv/blob/master/CMakeLists.txt 
 # 12 [ ] Set runtime path of "/usr/local/lib/python2.7/site-packages/cv2.so" to "/usr/local/lib" 
-# 13 [x] support Docker 17.05 ARG feature
+# 13 [x] support Docker 17.05 ARG feature now built as opencv:3.3.0-alpine:3.5
 ########
 
-ENV CPUCOUNT 1
-RUN CPUCOUNT=$(cat /proc/cpuinfo | grep '^processor.*:' | wc -l)
+LABEL org.label-schema.name="opencv" \
+      org.label-schema.description="opencv Docker" \
+      org.label-schema.url="https://hub.docker.com/r/sitkevij/opencv/" \
+      org.label-schema.vcs-url="https://github.com/sitkevij/opencv" \
+      org.label-schema.vendor="sitkevij" \
+      org.label-schema.version="3.3.0"
 
-RUN echo "ENV=$$HOME/.shrc; export ENV" >~/.profile && \
-    echo "export PYTHONPATH=/usr/local/lib/python2.7/site-packages:$$PYTHONPATH" >~/.shrc
+ENV CPUCOUNT 1
+RUN CPUCOUNT=$(cat /proc/cpuinfo | grep '^processor.*:' | wc -l) && echo "CPUCOUNT=${CPUCOUNT}"
 
 RUN echo -e '@edge http://nl.alpinelinux.org/alpine/edge/main\n@testing http://nl.alpinelinux.org/alpine/edge/testing' >> /etc/apk/repositories \
   && apk update && apk add ca-certificates && update-ca-certificates \
@@ -77,3 +81,4 @@ RUN cd \
     && rm -rf /var/cache/apk/* \
     # && apk del openssl build-base linux-headers unzip wget cmake git gnutls
 
+ENV PYTHONPATH=/usr/local/lib/python2.7/site-packages:$PYTHONPATH
