@@ -17,7 +17,7 @@ jobs:
       - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
       - docker build --build-arg BASEOS_VER=$BASEOS_VER --build-arg APP_VER=$APP_VER -t $DOCKER_USERNAME/$IMAGE:latest -t $DOCKER_USERNAME/$IMAGE:$VERSION $VERSION
       - docker images
-      - docker run $DOCKER_USERNAME/$IMAGE
+      - docker run --rm $DOCKER_USERNAME/$IMAGE sh "/root/unit-test.sh"
       - docker tag $DOCKER_USERNAME/$IMAGE:latest $DOCKER_USERNAME/$IMAGE:$VERSION
       - docker push $DOCKER_USERNAME/$IMAGE:latest
       - docker push $DOCKER_USERNAME/$IMAGE:$VERSION
