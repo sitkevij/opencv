@@ -1,8 +1,6 @@
-### !/bin/bash
 set -ex
 USERNAME=$1	# docker hub username
 APP_VER_BASEOS_VER=$2	# 3.3.0-alpine -> 3.3.0-alpine:3.5 "opencv:3.3.0-alpine:3.5"
-# BASE=$3 	# alpine:3.5 or python:2-alpine3.5
 echo "1=$1"
 echo "2=$2"
 APP_VERSION=$(echo $APP_VER_BASEOS_VER | cut -f1 -d-)

@@ -1,5 +1,5 @@
 ARG BASEOS_VER
-FROM $BASEOS_VER
+FROM python:2-$BASEOS_VER
 
 ARG APP_VER
 
@@ -36,8 +36,8 @@ LABEL org.label-schema.name="opencv" \
       org.label-schema.version="3.3.0" \
       maintainer="https://github.com/sitkevij"
 
-# to exec: docker run --rm sitkevij/opencv sh "/root/unit-test.sh"
-COPY unit-test.sh /root
+# to exec: docker run --rm sitkevij/opencv sh "~/unit-test.sh"
+COPY unit-test.sh ~/
 
 ENV CPUCOUNT 1
 RUN CPUCOUNT=`cat /proc/cpuinfo | grep '^processor.*:' | wc -l` && echo "CPUCOUNT=${CPUCOUNT}"
@@ -52,9 +52,11 @@ RUN echo -e '@edge http://nl.alpinelinux.org/alpine/edge/main\n@testing http://n
     unzip \ 
     wget \ 
     cmake \ 
-    python \
-    python-dev \
-    py-pip \
+    # git \ 
+    # gnutls \
+    # python \
+    # python-dev \
+    # py-pip \
     # python3-dev \
     libtbb@testing \
     libtbb-dev@testing \
@@ -63,7 +65,7 @@ RUN echo -e '@edge http://nl.alpinelinux.org/alpine/edge/main\n@testing http://n
     libpng-dev \ 
     tiff-dev \
     libjasper \
-    && pip install --upgrade pip \
+    # && pip install --upgrade pip \
     && pip install numpy 
 RUN cd \
     && wget https://github.com/Itseez/opencv/archive/${APP_VER}.zip
@@ -98,7 +100,10 @@ RUN cd \
     && rm ${APP_VER}.zip \
     && rm -rf /var/cache/apk/*
 
-# /usr/lib/python2.7/site-packages
+# CMD cp /usr/local/lib/python2.7/site-packages/cv2.so /usr/lib/python2.7/site-packages/
+
 CMD cp /root/opencv-3.3.0/build/lib/cv2.so /usr/local/lib/python2.7/site-packages/
+
+# /usr/lib/python2.7/site-packages
 
 ENV PYTHONPATH /usr/local/lib/python2.7/site-packages:$PYTHONPATH
