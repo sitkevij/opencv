@@ -30,7 +30,6 @@ LABEL org.label-schema.name="opencv" \
       org.label-schema.description="Small OpenCV (Open Source Computer Vision Library) Docker Image for Alpine Linux" \
       org.label-schema.url="https://hub.docker.com/r/sitkevij/opencv/" \
       org.label-schema.usage="https://github.com/sitkevij/opencv/blob/master/README.md" \
-      org.label-schema.vcs-url="https://github.com/sitkevij/ffmpeg" \
       org.label-schema.vcs-url="https://github.com/sitkevij/opencv" \
       org.label-schema.vendor="sitkevij" \
       org.label-schema.version="3.3.0" \
@@ -40,9 +39,8 @@ LABEL org.label-schema.name="opencv" \
 COPY unit-test.sh /root
 
 ENV CPUCOUNT 1
-RUN CPUCOUNT=`cat /proc/cpuinfo | grep '^processor.*:' | wc -l` && echo "CPUCOUNT=${CPUCOUNT}"
-
-RUN echo -e '@edge http://nl.alpinelinux.org/alpine/edge/main\n@testing http://nl.alpinelinux.org/alpine/edge/testing' >> /etc/apk/repositories \
+RUN CPUCOUNT=`cat /proc/cpuinfo | grep '^processor.*:' | wc -l` && echo "CPUCOUNT=${CPUCOUNT}" \
+&& echo -e '@edge http://nl.alpinelinux.org/alpine/edge/main\n@testing http://nl.alpinelinux.org/alpine/edge/testing' >> /etc/apk/repositories \
   && apk update && apk add ca-certificates && update-ca-certificates \
   && apk upgrade \
   && apk add --no-cache \ 
@@ -64,10 +62,10 @@ RUN echo -e '@edge http://nl.alpinelinux.org/alpine/edge/main\n@testing http://n
     tiff-dev \
     libjasper \
     && pip install --upgrade pip \
-    && pip install numpy 
-RUN cd \
-    && wget https://github.com/Itseez/opencv/archive/${APP_VER}.zip
-RUN cd \
+    && pip install numpy \
+&& cd \
+    && wget https://github.com/Itseez/opencv/archive/${APP_VER}.zip \
+&& cd \
     && unzip ${APP_VER}.zip \
     && cd opencv-${APP_VER} \
     && mkdir build \
